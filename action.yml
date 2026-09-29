@@ -1,5 +1,5 @@
 name: UXKIN UI Check
-description: Checks the frontend lines a pull request adds for inert controls, missing states, token drift, accessibility basics and generic UI patterns.
+description: Checks the UI code each pull request adds for dead controls, missing states, new colors and accessibility basics.
 author: UXKIN
 branding:
   icon: eye
