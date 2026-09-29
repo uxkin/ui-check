@@ -187,3 +187,21 @@ test("hardcoded-color ignores numbers in text", () => {
   assert.deepEqual(ids(run("<p>Fixed in PR #1234</p>")), []);
   assert.deepEqual(ids(run(".a { border: 1px solid #333; }", { path: "src/a.css" })), ["hardcoded-color"]);
 });
+
+test("missing-states: fixed arrays and differently named loading flags", () => {
+  const fixed = `export function Plans() {
+  const { data } = useQuery(pricesQuery);
+  const cards: { plan: string; title: string }[] = [{ plan: "a", title: "A" }];
+  return <div>{cards.map(c => <Card key={c.plan} price={data?.[c.plan]} />)}</div>;
+}`;
+  assert.deepEqual(ids(run(fixed)), []);
+
+  const named = `export function Packs() {
+  const [loadingPack, setLoadingPack] = useState(false);
+  const [error, setError] = useState("");
+  useEffect(() => { fetch("/api/packs").then(r => r.json()).then(setPacks).catch(setError); }, []);
+  if (!packs.length) return <p>No packs yet</p>;
+  return <ul>{packs.map(p => <li key={p.id}>{p.name}</li>)}</ul>;
+}`;
+  assert.deepEqual(ids(run(named)), []);
+});

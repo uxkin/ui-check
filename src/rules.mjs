@@ -289,12 +289,23 @@ export function checkFile({ path, text, added, disabled = new Set(), isTokenFile
 
   if (markup && !disabled.has("missing-states")) {
     const fetchMatch = text.match(/\b(fetch\(|useQuery\(|useSuspenseQuery\(|useInfiniteQuery\(|useSWR\(|axios\.|useFetch\(|\$fetch\(|createResource\()/);
-    const mapMatch = text.match(/\.map\(\s*\(?/);
+    // The first list rendered from data: skip fixed arrays written
+    // in the file itself (const PLANS = [...]) and ALL_CAPS constants.
+    let mapMatch = null;
+    for (const match of text.matchAll(/([\w$]+)\??\.map\(/g)) {
+      const name = match[1];
+      if (/^[A-Z0-9_]+$/.test(name)) continue;
+      // Allows a type annotation, which may contain ";" and "=>".
+      const literal = new RegExp(`\\b(?:const|let|var)\\s+${name.replace(/\$/g, "\\$")}\\s*(?::(?:[^=]|=>)*?)?=\\s*\\[`);
+      if (literal.test(text)) continue;
+      mapMatch = match;
+      break;
+    }
     if (fetchMatch && mapMatch) {
       const missing = [];
       const loading =
         hasSibling("loading") ||
-        /\b(loading|isLoading|isPending|pending|isFetching|Skeleton|Spinner|Suspense|fallback)\b/i.test(text);
+        /\b(?:is)?(?:loading|pending|fetching)\w*|\b(?:Skeleton|Spinner|Suspense|fallback)\b/i.test(text);
       const error =
         hasSibling("error") || /\b(error|isError|catch|ErrorBoundary|onError|failed)\b/i.test(text);
       const empty =
