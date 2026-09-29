@@ -1,0 +1,15 @@
+# The workflow from the README, exactly as users add it.
+name: UI check
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  ui-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: uxkin/ui-check@v1
