@@ -1,0 +1,25 @@
+name: Release
+
+# Publishing a release like v1.2.3 moves the major tag (v1) to it, so
+# workflows using uxkin/ui-check@v1 get the update.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  major-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Move the major version tag
+        run: |
+          MAJOR="${GITHUB_REF_NAME%%.*}"
+          if [ "$MAJOR" = "$GITHUB_REF_NAME" ]; then
+            echo "Release $GITHUB_REF_NAME is already a major tag; nothing to move."
+            exit 0
+          fi
+          git tag -f "$MAJOR"
+          git push -f origin "refs/tags/$MAJOR"
