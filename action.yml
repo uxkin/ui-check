@@ -1,0 +1,37 @@
+name: UXKIN UI Check
+description: Checks the frontend lines a pull request adds for inert controls, missing states, token drift, accessibility basics and generic UI patterns.
+author: UXKIN
+branding:
+  icon: eye
+  color: purple
+inputs:
+  fail-on:
+    description: "Fail the job on findings of this severity or worse: error, warning or never."
+    required: false
+    default: error
+  paths:
+    description: Comma or newline separated globs of files to check.
+    required: false
+    default: "**/*.{tsx,jsx,ts,js,vue,svelte,astro,html,css,scss}"
+  ignore:
+    description: Comma or newline separated globs of files to skip, in addition to build folders and tests.
+    required: false
+    default: ""
+  disable:
+    description: Comma separated check ids to turn off, for example "hardcoded-color,generic-label".
+    required: false
+    default: ""
+  base:
+    description: Commit to compare against. Defaults to the pull request base, or the previous commit on push.
+    required: false
+    default: ""
+outputs:
+  errors:
+    description: Number of error findings.
+  warnings:
+    description: Number of warning findings.
+  notices:
+    description: Number of notice findings.
+runs:
+  using: node24
+  main: src/main.mjs
